@@ -13,6 +13,9 @@
 - If yes, describe at least one change and why you made it.
 
 ---
+ → Enter the Owner and Pet Information.
+ → Add, Edit, and Manage Pet Care Tasks.
+ → Generates a Schedule that is automatically based on the Constraints and Priorities.
 
 ## 2. Scheduling Logic and Tradeoffs
 
