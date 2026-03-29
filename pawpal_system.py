@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from itertools import combinations
 from typing import List
 
@@ -195,7 +195,12 @@ class Schedule:
             key=lambda t: (priority_order.get(t.getPriority(), 3), t.getDuration())
         )
         
-        # Add sorted tasks to the schedule
+        # Assign start times beginning at 08:00, incrementing by each task's duration
+        current_time = datetime(2000, 1, 1, 8, 0)
+        for task in sorted_tasks:
+            task.time = current_time.strftime("%H:%M")
+            current_time += timedelta(minutes=task.getDuration())
+
         self.tasks = sorted_tasks
     
     def addTask(self, task: Task) -> str | None:
@@ -286,8 +291,9 @@ class Schedule:
     
     def canFitSchedule(self) -> bool:
         """Check if all scheduled tasks fit within owner's available time."""
-        total_duration = sum(task.getDuration() for task in self.tasks)
-        return total_duration <= self.owner.getTimeAvailability()
+        total_duration_min = sum(task.getDuration() for task in self.tasks)
+        available_min = self.owner.getTimeAvailability() * 60
+        return total_duration_min <= available_min
     
     def getTotalScheduledTime(self) -> float:
         """Get the total time required for all scheduled tasks."""

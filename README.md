@@ -42,6 +42,9 @@ pip install -r requirements.txt
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
 
+## 📸 Demo
+<a href="uml_final.png" target="_blank"><img src='uml_final.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
+
 ## Smarter Scheduling
 
 The three main features are the Owner, Pet, Task, and Schedule Classes and the Functions included in it. The Owner class is the most important class in the program by how it is the one where it stores the information/data where the class Schedule and Pet get their data from, in which Tasks get data from Pet. The featured functions are functions that make the readibility and performance easy.
@@ -50,3 +53,13 @@ The three main features are the Owner, Pet, Task, and Schedule Classes and the F
 
 python -m pytest
 During the testing parts, it basically covered the three suite mentioned in Phase 5 Step 2, Sorting Correctness where it ensures that the teasks are returned in chronological order, Recurrence logic to confirm that completing a daily creates new task, and finnaly Conflict Detection to ensure the my Schedule class flags a conflict of duplicate datas. The reason for this because I interpreted the test functions as the testing and verifying of the core behaviors. Unless I'm wrong. I would say about 4 starts because even if it says that all passed, I know that there are some things that may cause another error and such.
+
+## Features
+
+- **Priority-Based Scheduling** — `generateSchedule()` sorts all tasks high → medium → low priority, then by shortest duration within each tier, so critical care always appears first.
+- **Sort by Time** — `sort_by_time()` returns the schedule in chronological order (earliest `HH:MM` first); the UI uses this to display tasks in a time-ordered table.
+- **Conflict Detection** — `getConflicts()` uses `itertools.combinations` to find every pair of tasks sharing the same time slot; `hasConflicts()` and `addTask()` surface warnings in the UI when overlaps exist.
+- **Daily & Weekly Recurrence** — completing a recurring task via `markCompleted()` automatically spawns a new incomplete copy due the next day (`timedelta(days=1)`) or next week (`timedelta(weeks=1)`).
+- **Availability Check** — `canFitSchedule()` compares total scheduled minutes against the owner's available hours and displays a pass/fail banner.
+- **Per-Pet Filtering** — `filterTasks(pet_name=...)` lets the owner view only tasks belonging to a specific pet without rebuilding the schedule.
+- **Multi-Pet Support** — `Owner.getAllTasks()` aggregates tasks across every pet, and the schedule treats them as one unified pool for sorting and conflict checking.
