@@ -43,7 +43,7 @@ pip install -r requirements.txt
 7. Refine UML so it matches what you actually built.
 
 ## 📸 Demo
-<a href="uml_final.png" target="_blank"><img src='uml_final.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
+<a href="Project_2_Demo.png" target="_blank"><img src='Project_2_Demo.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
 
 ## Smarter Scheduling
 
