@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 from dataclasses import dataclass, field
+from datetime import date, timedelta
+from itertools import combinations
 from typing import List
 
 
@@ -116,6 +118,9 @@ class Task:
     name: str
     duration: float
     priority: str
+    time: str = "00:00"
+    recurrence: str = None          # "daily", "weekly", or None
+    due_date: date = field(default_factory=date.today)
     pet: Pet = field(default=None)
     completed: bool = False
     
@@ -136,8 +141,29 @@ class Task:
         self.priority = priority
     
     def markCompleted(self) -> None:
-        """Mark this task as completed."""
+        """Mark this task as completed and schedule the next occurrence if recurring."""
         self.completed = True
+        if self.recurrence and self.pet:
+            next_task = self.next_occurrence()
+            self.pet.addTask(next_task)
+
+    def next_occurrence(self) -> Task:
+        """Return a new incomplete Task for the next occurrence based on recurrence."""
+        if self.recurrence == "daily":
+            next_date = self.due_date + timedelta(days=1)
+        elif self.recurrence == "weekly":
+            next_date = self.due_date + timedelta(weeks=1)
+        else:
+            return None
+
+        return Task(
+            name=self.name,
+            duration=self.duration,
+            priority=self.priority,
+            time=self.time,
+            recurrence=self.recurrence,
+            due_date=next_date,
+        )
     
     def isCompleted(self) -> bool:
         """Check if this task is completed."""
@@ -172,10 +198,29 @@ class Schedule:
         # Add sorted tasks to the schedule
         self.tasks = sorted_tasks
     
-    def addTask(self, task: Task) -> None:
-        """Add a task to the schedule."""
-        if task not in self.tasks:
-            self.tasks.append(task)
+    def addTask(self, task: Task) -> str | None:
+        """Add a task to the schedule.
+
+        Returns a warning string if the task's time conflicts with an existing
+        task, or None if the task was added without issue. The task is always
+        added regardless of conflicts.
+        """
+        if task in self.tasks:
+            return None
+
+        warning = None
+        for existing in self.tasks:
+            if existing.time == task.time:
+                existing_pet = existing.pet.name if existing.pet else "Unknown"
+                new_pet = task.pet.name if task.pet else "Unknown"
+                warning = (
+                    f"WARNING: '{task.name}' ({new_pet}) conflicts with "
+                    f"'{existing.name}' ({existing_pet}) -- both scheduled at {task.time}"
+                )
+                break
+
+        self.tasks.append(task)
+        return warning
     
     def removeTask(self, task: Task) -> None:
         """Remove a task from the schedule."""
@@ -190,9 +235,54 @@ class Schedule:
         """Get tasks filtered by priority level."""
         return [task for task in self.tasks if task.getPriority() == priority]
     
+    # Sorting Logic
+    def sort_by_time(self) -> List[Task]:
+        """Return tasks sorted by their time attribute (earliest first)."""
+        return sorted(self.tasks, key=lambda t: t.time)
+
     def getTasksByPet(self, pet: Pet) -> List[Task]:
         """Get tasks for a specific pet from the schedule."""
         return [task for task in self.tasks if task.pet == pet]
+
+    # Conflict Detection
+    def getConflicts(self) -> List[tuple]:
+        """Return pairs of tasks scheduled at the same time.
+
+        Returns:
+            A list of (Task, Task) tuples where both tasks share the same time value.
+            Each conflicting pair appears once.
+        """
+        return [
+            (a, b) for a, b in combinations(self.tasks, 2)
+            if a.time == b.time
+        ]
+
+    def hasConflicts(self) -> bool:
+        """Return True if any two tasks share the same scheduled time."""
+        return len(self.getConflicts()) > 0
+
+    # Filtering Logic
+    def filterTasks(self, completed: bool = None, pet_name: str = None) -> List[Task]:
+        """Filter tasks by completion status, pet name, or both.
+
+        Args:
+            completed: If True, return only completed tasks. If False, return only
+                       incomplete tasks. If None, completion status is not filtered.
+            pet_name:  If provided, return only tasks belonging to a pet with this name.
+                       If None, all pets are included.
+
+        Returns:
+            A list of Task objects matching all specified criteria.
+        """
+        result = self.tasks
+
+        if completed is not None:
+            result = [task for task in result if task.isCompleted() == completed]
+
+        if pet_name is not None:
+            result = [task for task in result if task.pet and task.pet.getName() == pet_name]
+
+        return result
     
     def canFitSchedule(self) -> bool:
         """Check if all scheduled tasks fit within owner's available time."""

@@ -25,11 +25,13 @@
 
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
 - How did you decide which constraints mattered most?
+    → Some constrains my Schedule considers are the Owner's Available Time, Priority of the Tasks, and Time/Tasks Overlapping with one another. I usually decide which contraints matters the most by how it would work in real life. For example, a dog can't be walking while also being groomed at the same time.
 
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
+    → One Tradeoff I found in my Schedule is from the function "if existing.time == task.time:". This allows for simple writing for it's single comparison. But from it, there won't be overlapping of tasks's time. I would say this is reasonable by how let's say that an Owner's Pet has 1 hour walk around 8:00 and a Grooming service at around 8:20. Causing it to be impossible for the Pet to do at the same time.
 
 ---
 
