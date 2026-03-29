@@ -41,3 +41,7 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+## Smarter Scheduling
+
+The three main features are the Owner, Pet, Task, and Schedule Classes and the Functions included in it. The Owner class is the most important class in the program by how it is the one where it stores the information/data where the class Schedule and Pet get their data from, in which Tasks get data from Pet. The featured functions are functions that make the readibility and performance easy.
